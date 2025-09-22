@@ -1,0 +1,9 @@
+diff a/SOURCE_CODE/Core/Src/main.c b/SOURCE_CODE/Core/Src/main.c	(rejected hunks)
+@@ -63,6 +63,7 @@
+ int main(void)
+ {
+   /* USER CODE BEGIN 1 */
++	//todo 1
+ 
+   /* USER CODE END 1 */
+ 
