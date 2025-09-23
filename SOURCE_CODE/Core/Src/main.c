@@ -4,12 +4,27 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN 0 */
+// Hàm tắt tất cả LED
 void clearAllClock(void) {
     HAL_GPIO_WritePin(GPIOA,
                       CLOCK_1_Pin | CLOCK_2_Pin | CLOCK_3_Pin | CLOCK_4_Pin |
                       CLOCK_5_Pin | CLOCK_6_Pin | CLOCK_7_Pin | CLOCK_8_Pin |
                       CLOCK_9_Pin | CLOCK_10_Pin | CLOCK_11_Pin | CLOCK_12_Pin,
                       GPIO_PIN_RESET);
+}
+
+// Hàm bật LED theo số num (0-11)
+void setNumberOnClock(int num) {
+    if (num < 0 || num > 11) return;
+
+    int leds[12] = {
+        CLOCK_1_Pin, CLOCK_2_Pin, CLOCK_3_Pin, CLOCK_4_Pin,
+        CLOCK_5_Pin, CLOCK_6_Pin, CLOCK_7_Pin, CLOCK_8_Pin,
+        CLOCK_9_Pin, CLOCK_10_Pin, CLOCK_11_Pin, CLOCK_12_Pin
+    };
+
+    clearAllClock(); // tắt hết
+    HAL_GPIO_WritePin(GPIOA, leds[num], GPIO_PIN_SET); // bật LED chỉ định
 }
 /* USER CODE END 0 */
 
@@ -20,20 +35,14 @@ int main(void)
   MX_GPIO_Init();
 
   /* USER CODE BEGIN 2 */
-  int leds[12] = {
-      CLOCK_1_Pin, CLOCK_2_Pin, CLOCK_3_Pin, CLOCK_4_Pin,
-      CLOCK_5_Pin, CLOCK_6_Pin, CLOCK_7_Pin, CLOCK_8_Pin,
-      CLOCK_9_Pin, CLOCK_10_Pin, CLOCK_11_Pin, CLOCK_12_Pin
-  };
   /* USER CODE END 2 */
 
   while (1)
   {
     /* USER CODE BEGIN 3 */
     for (int i = 0; i < 12; i++) {
-      clearAllClock();  // tắt tất cả LED trước
-      HAL_GPIO_WritePin(GPIOA, leds[i], GPIO_PIN_SET); // bật LED i
-      HAL_Delay(500);
+        setNumberOnClock(i);   // bật LED theo số i
+        HAL_Delay(500);        // giữ sáng 0.5 giây
     }
     /* USER CODE END 3 */
   }
@@ -75,7 +84,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  // ban đầu tắt tất cả LED
   HAL_GPIO_WritePin(GPIOA, GPIO_InitStruct.Pin, GPIO_PIN_RESET);
 }
 
@@ -84,6 +92,7 @@ void Error_Handler(void)
   __disable_irq();
   while (1) {}
 }
+
 
 
 #ifdef  USE_FULL_ASSERT
