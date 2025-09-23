@@ -58,6 +58,30 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define CLOCK_1_Pin GPIO_PIN_4
+#define CLOCK_1_GPIO_Port GPIOA
+#define CLOCK_2_Pin GPIO_PIN_5
+#define CLOCK_2_GPIO_Port GPIOA
+#define CLOCK_3_Pin GPIO_PIN_6
+#define CLOCK_3_GPIO_Port GPIOA
+#define CLOCK_4_Pin GPIO_PIN_7
+#define CLOCK_4_GPIO_Port GPIOA
+#define CLOCK_5_Pin GPIO_PIN_8
+#define CLOCK_5_GPIO_Port GPIOA
+#define CLOCK_6_Pin GPIO_PIN_9
+#define CLOCK_6_GPIO_Port GPIOA
+#define CLOCK_7_Pin GPIO_PIN_10
+#define CLOCK_7_GPIO_Port GPIOA
+#define CLOCK_8_Pin GPIO_PIN_11
+#define CLOCK_8_GPIO_Port GPIOA
+#define CLOCK_9_Pin GPIO_PIN_12
+#define CLOCK_9_GPIO_Port GPIOA
+#define CLOCK_10_Pin GPIO_PIN_13
+#define CLOCK_10_GPIO_Port GPIOA
+#define CLOCK_11_Pin GPIO_PIN_14
+#define CLOCK_11_GPIO_Port GPIOA
+#define CLOCK_12_Pin GPIO_PIN_15
+#define CLOCK_12_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
