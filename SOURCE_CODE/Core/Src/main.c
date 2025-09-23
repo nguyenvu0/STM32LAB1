@@ -3,6 +3,16 @@
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 
+/* USER CODE BEGIN 0 */
+void clearAllClock(void) {
+    HAL_GPIO_WritePin(GPIOA,
+                      CLOCK_1_Pin | CLOCK_2_Pin | CLOCK_3_Pin | CLOCK_4_Pin |
+                      CLOCK_5_Pin | CLOCK_6_Pin | CLOCK_7_Pin | CLOCK_8_Pin |
+                      CLOCK_9_Pin | CLOCK_10_Pin | CLOCK_11_Pin | CLOCK_12_Pin,
+                      GPIO_PIN_RESET);
+}
+/* USER CODE END 0 */
+
 int main(void)
 {
   HAL_Init();
@@ -21,21 +31,15 @@ int main(void)
   {
     /* USER CODE BEGIN 3 */
     for (int i = 0; i < 12; i++) {
-      // Tắt tất cả LED trước
-      HAL_GPIO_WritePin(GPIOA, CLOCK_1_Pin|CLOCK_2_Pin|CLOCK_3_Pin|CLOCK_4_Pin|
-                                 CLOCK_5_Pin|CLOCK_6_Pin|CLOCK_7_Pin|CLOCK_8_Pin|
-                                 CLOCK_9_Pin|CLOCK_10_Pin|CLOCK_11_Pin|CLOCK_12_Pin,
-                                 GPIO_PIN_RESET);
-
-      // Bật LED i
-      HAL_GPIO_WritePin(GPIOA, leds[i], GPIO_PIN_SET);
-
-      HAL_Delay(1000); // mỗi LED sáng 1 giây
+      clearAllClock();  // tắt tất cả LED trước
+      HAL_GPIO_WritePin(GPIOA, leds[i], GPIO_PIN_SET); // bật LED i
+      HAL_Delay(500);
     }
     /* USER CODE END 3 */
   }
 }
 
+/* ====================== System & GPIO ====================== */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -54,7 +58,6 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
     Error_Handler();
 }
@@ -64,7 +67,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
-  // Cấu hình PA4 → PA15 output push-pull
   GPIO_InitStruct.Pin = CLOCK_1_Pin|CLOCK_2_Pin|CLOCK_3_Pin|CLOCK_4_Pin|
                         CLOCK_5_Pin|CLOCK_6_Pin|CLOCK_7_Pin|CLOCK_8_Pin|
                         CLOCK_9_Pin|CLOCK_10_Pin|CLOCK_11_Pin|CLOCK_12_Pin;
@@ -73,7 +75,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  // Tắt tất cả LED ban đầu
+  // ban đầu tắt tất cả LED
   HAL_GPIO_WritePin(GPIOA, GPIO_InitStruct.Pin, GPIO_PIN_RESET);
 }
 
