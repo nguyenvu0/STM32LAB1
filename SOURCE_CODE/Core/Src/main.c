@@ -2,7 +2,7 @@
 /**
   ******************************************************************************
   * @file           : main.c
-  * @brief          : Main program body - Exercise 10: Complete Clock System
+  * @brief          : Main program body - Exercise 10: Sequential Clock Simulation
   ******************************************************************************
   * @attention
   *
@@ -13,10 +13,8 @@
   */
 /* USER CODE END Header */
 
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 
@@ -24,7 +22,6 @@ static void MX_GPIO_Init(void);
 void setNumberOnClock(int num);
 void clearNumberOnClock(int num);
 void clearAllClock(void);
-void displayTimeOnClock(int hour, int minute, int second);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN PV */
@@ -51,24 +48,6 @@ void clearAllClock(void) {
         HAL_GPIO_WritePin(GPIOA, leds[i], GPIO_PIN_RESET);
     }
 }
-
-void displayTimeOnClock(int hour, int minute, int second) {
-    if (hour < 0 || hour > 23) return;
-    if (minute < 0 || minute > 59) return;
-    if (second < 0 || second > 59) return;
-
-    // Mapping: leds[0] = 12h, leds[1] = 1h, ..., leds[11] = 11h
-    int hourPos   = hour % 12;   // 0 → 12h
-    int minutePos = minute / 5;  // 0–59 phút → 0–11
-    int secondPos = second / 5;  // 0–59 giây → 0–11
-
-    clearAllClock();  // tắt hết LED trước khi hiển thị
-
-    // Bật LED cho giờ, phút, giây
-    setNumberOnClock(hourPos);
-    setNumberOnClock(minutePos);
-    setNumberOnClock(secondPos);
-}
 /* USER CODE END 0 */
 
 int main(void)
@@ -78,35 +57,36 @@ int main(void)
   MX_GPIO_Init();
 
   /* USER CODE BEGIN 2 */
-  int hour = 3;    // bắt đầu từ 3 giờ
-  int minute = 25; // bắt đầu từ 25 phút
-  int second = 0;  // bắt đầu từ 0 giây
+  int hourPos = 0;    // kim giờ bắt đầu ở 12h
+  int minutePos = 0;  // kim phút bắt đầu ở 12h
+  int secondPos = 0;  // kim giây bắt đầu ở 12h
+
+  setNumberOnClock(hourPos);  // bật LED kim giờ ban đầu
   /* USER CODE END 2 */
 
   while (1)
   {
     /* USER CODE BEGIN 3 */
-    displayTimeOnClock(hour, minute, second);
-    HAL_Delay(1000);  // delay 1 giây
+    // Kim giây chạy 1 vòng
+    for (secondPos = 0; secondPos < 12; secondPos++) {
+        clearAllClock();
+        setNumberOnClock(hourPos);    // giữ nguyên kim giờ
+        setNumberOnClock(minutePos);  // giữ nguyên kim phút
+        setNumberOnClock(secondPos);  // chạy kim giây
+        HAL_Delay(100);              // delay 1 giây
+    }
 
-    // Cập nhật thời gian
-    second++;
-    if (second >= 60) {
-        second = 0;
-        minute++;
-        if (minute >= 60) {
-            minute = 0;
-            hour++;
-            if (hour >= 24) hour = 0;
-        }
+    // Sau khi kim giây chạy 1 vòng → kim phút nhảy 1 bước
+    minutePos++;
+    if (minutePos >= 12) {
+        minutePos = 0;
+        hourPos++;
+        if (hourPos >= 12) hourPos = 0;  // quay lại từ 12h
     }
     /* USER CODE END 3 */
   }
 }
 
-/**
-  * @brief System Clock Configuration
-  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -129,9 +109,6 @@ void SystemClock_Config(void)
     Error_Handler();
 }
 
-/**
-  * @brief GPIO Initialization Function
-  */
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -145,7 +122,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  clearAllClock(); // ban đầu tắt tất cả LED
+  clearAllClock(); // tắt tất cả LED khi khởi động
 }
 
 void Error_Handler(void)
@@ -153,6 +130,8 @@ void Error_Handler(void)
   __disable_irq();
   while (1) {}
 }
+
+
 
 
 
