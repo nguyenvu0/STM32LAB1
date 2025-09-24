@@ -2,65 +2,36 @@
 /**
   ******************************************************************************
   * @file           : main.c
-  * @brief          : Main program body
+  * @brief          : Main program body - Exercise 9 (Clockwise OFF)
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * Copyright (c) 2025.
+  * All rights reserved.
   *
   ******************************************************************************
   */
 /* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+
 /* USER CODE BEGIN PFP */
 void setNumberOnClock(int num);
 void clearNumberOnClock(int num);
+void setAllClock(void);
 /* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
+/* USER CODE BEGIN PV */
 int leds[12] = {
     CLOCK_1_Pin, CLOCK_2_Pin, CLOCK_3_Pin, CLOCK_4_Pin,
     CLOCK_5_Pin, CLOCK_6_Pin, CLOCK_7_Pin, CLOCK_8_Pin,
     CLOCK_9_Pin, CLOCK_10_Pin, CLOCK_11_Pin, CLOCK_12_Pin
 };
+/* USER CODE END PV */
 
+/* USER CODE BEGIN 0 */
 void setNumberOnClock(int num) {
     if (num < 0 || num > 11) return;
     HAL_GPIO_WritePin(GPIOA, leds[num], GPIO_PIN_SET);   // bật LED num
@@ -70,40 +41,39 @@ void clearNumberOnClock(int num) {
     if (num < 0 || num > 11) return;
     HAL_GPIO_WritePin(GPIOA, leds[num], GPIO_PIN_RESET); // tắt LED num
 }
+
+void setAllClock(void) {
+    for (int i = 0; i < 12; i++) {
+        HAL_GPIO_WritePin(GPIOA, leds[i], GPIO_PIN_SET); // bật tất cả LED
+    }
+}
 /* USER CODE END 0 */
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 int main(void)
 {
-  /* MCU Configuration--------------------------------------------------------*/
-
   HAL_Init();
   SystemClock_Config();
   MX_GPIO_Init();
 
   /* USER CODE BEGIN 2 */
+  setAllClock(); // ban đầu bật sáng hết LED
   /* USER CODE END 2 */
 
   while (1)
   {
     /* USER CODE BEGIN 3 */
-    // Quét LED chạy vòng quanh: bật -> delay -> tắt
-    for (int i = 0; i < 12; i++) {
-      setNumberOnClock(i);       // bật LED i
-      HAL_Delay(300);            // delay 0.3s
-      clearNumberOnClock(i);     // tắt LED i
+    for (int i = 0; i < 12; i++) {   // chạy 0 → 11 theo chiều kim đồng hồ
+      clearNumberOnClock(i);        // tắt LED i
+      HAL_Delay(1000);              // delay 1 giây
     }
+
+    // Sau khi tắt hết -> bật lại toàn bộ và lặp lại
+    setAllClock();
+    HAL_Delay(1000);
     /* USER CODE END 3 */
   }
 }
 
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -114,9 +84,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
     Error_Handler();
-  }
 
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -124,49 +92,33 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
     Error_Handler();
-  }
 }
 
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-  /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, CLOCK_1_Pin|CLOCK_2_Pin|CLOCK_3_Pin|CLOCK_4_Pin
-                          |CLOCK_5_Pin|CLOCK_6_Pin|CLOCK_7_Pin|CLOCK_8_Pin
-                          |CLOCK_9_Pin|CLOCK_10_Pin|CLOCK_11_Pin|CLOCK_12_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : CLOCK_1_Pin ... CLOCK_12_Pin */
-  GPIO_InitStruct.Pin = CLOCK_1_Pin|CLOCK_2_Pin|CLOCK_3_Pin|CLOCK_4_Pin
-                          |CLOCK_5_Pin|CLOCK_6_Pin|CLOCK_7_Pin|CLOCK_8_Pin
-                          |CLOCK_9_Pin|CLOCK_10_Pin|CLOCK_11_Pin|CLOCK_12_Pin;
+  GPIO_InitStruct.Pin = CLOCK_1_Pin|CLOCK_2_Pin|CLOCK_3_Pin|CLOCK_4_Pin|
+                        CLOCK_5_Pin|CLOCK_6_Pin|CLOCK_7_Pin|CLOCK_8_Pin|
+                        CLOCK_9_Pin|CLOCK_10_Pin|CLOCK_11_Pin|CLOCK_12_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  setAllClock(); // bật sáng tất cả LED khi khởi động
 }
-
-/* USER CODE BEGIN 4 */
-/* USER CODE END 4 */
 
 void Error_Handler(void)
 {
   __disable_irq();
   while (1) {}
 }
+
+
 
 
 #ifdef  USE_FULL_ASSERT
